@@ -43,7 +43,10 @@ public class Path {
         return distance;
     }
 
-    public void setStartingCity(City city) {
+    public boolean setStartingCity(City city) {
+        if (!this.availableCities.contains(city)) return false;
+
         this.path.add(0, city);
+        return true;
     }
 }
