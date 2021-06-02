@@ -2,9 +2,9 @@ package path;
 
 import city.City;
 
-import java.sql.Array;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedList;
 
 public class Path {
     private final List<City> path;
@@ -14,7 +14,7 @@ public class Path {
     // initialize availableCities field with List passed, deep copy
     // initialize path
     public Path(List<City> availableCities) {
-        this.availableCities = new ArrayList<City>(availableCities);
+        this.availableCities = new LinkedList<City>(availableCities);
         this.path = new ArrayList<City>(availableCities.size());
         this.stateArray = new ArrayList<List<City>>();
 
@@ -50,10 +50,34 @@ public class Path {
         return distance;
     }
 
+    public List<City> getAvailableCities() {
+        return this.availableCities;
+    }
+
     public boolean setStartingCity(City city) {
         if (!this.availableCities.contains(city)) return false;
 
         this.path.add(0, city);
+        this.availableCities.remove(city);
         return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        ret.append("Available Cities: {");
+        for (City city: this.availableCities) {
+            ret.append(city.toString());
+            ret.append(", ");
+        }
+
+        ret.append("}\nPath: {");
+        for (City city: this.path) {
+            ret.append(city.toString());
+            ret.append(", ");
+        }
+
+        ret.append("}\n");
+        return ret.toString();
     }
 }
