@@ -31,4 +31,9 @@ public class City {
         City t = (City)o;
         return this.x == t.getX() && this.y == t.getY();
     }
+
+    @Override
+    public String toString() {
+        return "(" + this.getX() + ", " + this.getY() + ")";
+    }
 }
