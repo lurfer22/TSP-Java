@@ -61,8 +61,8 @@ public class Model {
         this.generateCities(size);
     }
 
-    public void setStartingCity(City city) {
-        this.path.setStartingCity(city);
+    public boolean setStartingCity(City city) {
+        return this.path.setStartingCity(city);
     }
 
     public void solvePath(AlgorithmName type) {
