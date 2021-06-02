@@ -16,16 +16,19 @@ public class Model {
     private int upperBoundY;
 
     public Model(int numOfCities) {
+        int DEFAULT_UPPER_BOUNDS = 200;
+        this.upperBoundX = DEFAULT_UPPER_BOUNDS;
+        this.upperBoundY = DEFAULT_UPPER_BOUNDS;
+
         this.cities = new ArrayList<City>(numOfCities);
         this.generateCities(numOfCities);
 
         this.path = new Path(this.cities);
-
-        this.upperBoundX = 200;
-        this.upperBoundY = 200;
     }
 
     public void setNumberOfCities(int newCityAmount) {
+        if (newCityAmount <= 1)
+            throw new IllegalArgumentException("Setting number of cities to less than or equal to 1");
         // since we are updating number of cities, we need to create a new cities array, with fresh city objects,
         // and create a new path array.
 
@@ -37,18 +40,25 @@ public class Model {
             this.generateCities(newCityAmount - this.cities.size());
         }
 
+        // create a new path object
         this.path = new Path(this.cities);
     }
 
     // since I update the upper bounds, we need to also erase our cities array and push new city objects into it.
     public void setUpperBounds(int x, int y) {
+        if (x < 0 || y < 0)
+            throw new IllegalArgumentException("Upper bounds coords are being set to less than zero.");
+
         this.upperBoundX = x;
         this.upperBoundY = y;
 
-        int tempSize = this.cities.size();
+        // since no number of cities instance var,
+        // save the size of the old cities list to generate
+        // new cities
+        int size = this.cities.size();
         this.cities = new ArrayList<City>();
 
-        this.generateCities(tempSize);
+        this.generateCities(size);
     }
 
     public void setStartingCity(City city) {
