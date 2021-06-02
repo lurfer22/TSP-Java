@@ -27,7 +27,7 @@ public class PathTest {
             assertFalse(path.addCityToEndOfPath(city));
         }
 
-        // what about if we send it a city not in availabelCities?
+        // what about if we send it a city not in availableCities?
         City notInCitiesArray = new City(-10, -10);
         assertFalse(path.addCityToEndOfPath(notInCitiesArray));
     }
