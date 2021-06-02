@@ -1,18 +1,23 @@
 package path;
 
 import city.City;
+
+import java.sql.Array;
 import java.util.List;
 import java.util.ArrayList;
 
 public class Path {
     private final List<City> path;
     private final List<City> availableCities;
+    private List<List<City>> stateArray;
 
     // initialize availableCities field with List passed, deep copy
     // initialize path
     public Path(List<City> availableCities) {
         this.availableCities = new ArrayList<City>(availableCities);
         this.path = new ArrayList<City>(availableCities.size());
+        this.stateArray = new ArrayList<List<City>>();
+
     }
 
     // return true if city was able to be added, false if otherwise
@@ -21,6 +26,8 @@ public class Path {
 
         this.path.add(city);
         this.availableCities.remove(city);
+        // copy the current path into state array, used for drawing purposes
+        this.stateArray.add(new ArrayList<City>(this.path));
         return true;
     }
 
