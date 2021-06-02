@@ -1,5 +1,7 @@
 package model;
 
+import algorithms.Algorithm;
+import algorithms.NearestNeighbor;
 import path.Path;
 import city.City;
 import algoname.AlgorithmName;
@@ -20,7 +22,6 @@ public class Model {
         this.upperBoundX = DEFAULT_UPPER_BOUNDS;
         this.upperBoundY = DEFAULT_UPPER_BOUNDS;
 
-        this.cities = new ArrayList<City>(numOfCities);
         this.generateCities(numOfCities);
 
         this.path = new Path(this.cities);
@@ -55,10 +56,8 @@ public class Model {
         // since no number of cities instance var,
         // save the size of the old cities list to generate
         // new cities
-        int size = this.cities.size();
-        this.cities = new ArrayList<City>();
 
-        this.generateCities(size);
+        this.generateCities(this.cities.size());
     }
 
     public boolean setStartingCity(City city) {
@@ -66,10 +65,18 @@ public class Model {
     }
 
     public void solvePath(AlgorithmName type) {
+        if (this.path.getStartingCity() == null)
+            this.path.setStartingCity(this.cities.get(0));
 
+        Algorithm currAlgo = null;
+        if (type == AlgorithmName.NEAREST_NEIGHBOR) {
+            currAlgo = new NearestNeighbor(this.path);
+        }
     }
 
     public void generateCities(int numOfCities) {
+        this.cities = new ArrayList<City>(numOfCities);
+
         Random rand = new Random();
         for (int i = 0; i < numOfCities; i++) {
             City newCity = new City(rand.nextInt(this.upperBoundX), rand.nextInt(this.upperBoundY));
