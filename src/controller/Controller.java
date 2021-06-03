@@ -25,11 +25,8 @@ public class Controller {
         return this.model.getCities();
     }
 
-    public Path getSolvedPath() {
-        Path path = this.model.getSolvedPath();
-        if (path == null)
-            System.out.println("Must solve for the path!");
-        return path;
+    public List<City> getCompletedPath() {
+        return this.model.getSolvedPath();
     }
 
     public void setUpperBounds(int x, int y) {
