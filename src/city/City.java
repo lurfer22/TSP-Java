@@ -13,7 +13,8 @@ public class City {
     // this city
     // d=Math.sqrt((x2−x1)^2 + (y2−y1)^2)
     public double calculateDistance(City city) {
-        return Math.sqrt(Math.pow(city.getX() - this.x, 2) + Math.pow(city.getY() - this.y, 2));
+        //return Math.sqrt(Math.pow(city.getX() - this.x, 2) + Math.pow(city.getY() - this.y, 2));
+        return Math.hypot(Math.abs(city.getY() - this.y), Math.abs(city.getX() - this.x));
     }
 
     public int getX() {
