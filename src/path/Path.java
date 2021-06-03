@@ -54,6 +54,10 @@ public class Path {
         return this.availableCities;
     }
 
+    public List<City> getPath() {
+        return this.path;
+    }
+
     public boolean setStartingCity(City city) {
         if (!this.availableCities.contains(city)) return false;
 
