@@ -6,7 +6,6 @@ import path.Path;
 import city.City;
 import algoname.AlgorithmName;
 
-import java.sql.Array;
 import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
@@ -25,6 +24,21 @@ public class Model {
         this.generateCities(numOfCities);
 
         this.path = new Path(this.cities);
+    }
+
+    private void generateCities(int numOfCities) {
+        this.cities = new ArrayList<City>(numOfCities);
+
+        Random rand = new Random();
+        for (int i = 0; i < numOfCities; i++) {
+            City newCity = new City(rand.nextInt(this.upperBoundX), rand.nextInt(this.upperBoundY));
+
+            while (this.cities.contains(newCity)) {
+                newCity = new City(rand.nextInt(this.upperBoundX), rand.nextInt(this.upperBoundY));
+            }
+
+            this.cities.add(newCity);
+        }
     }
 
     public void setNumberOfCities(int newCityAmount) {
@@ -58,6 +72,7 @@ public class Model {
         // new cities
 
         this.generateCities(this.cities.size());
+        this.path = new Path(this.cities);
     }
 
     public boolean setStartingCity(City city) {
@@ -65,6 +80,7 @@ public class Model {
     }
 
     public void solvePath(AlgorithmName type) {
+        // if user hasn't already declared a starting city, then pick the first city in cities array
         if (this.path.getStartingCity() == null)
             this.path.setStartingCity(this.cities.get(0));
 
@@ -74,23 +90,13 @@ public class Model {
         }
     }
 
-    public void generateCities(int numOfCities) {
-        this.cities = new ArrayList<City>(numOfCities);
-
-        Random rand = new Random();
-        for (int i = 0; i < numOfCities; i++) {
-            City newCity = new City(rand.nextInt(this.upperBoundX), rand.nextInt(this.upperBoundY));
-
-            while (this.cities.contains(newCity)) {
-                newCity = new City(rand.nextInt(this.upperBoundX), rand.nextInt(this.upperBoundY));
-            }
-
-            this.cities.add(newCity);
+    public List<City> getSolvedPath() {
+        if (!this.path.isSolved()) {
+            System.out.println("Must execute solvePath(AlgorithmName type) before requesting path.");
+            return null;
         }
-    }
 
-    public Path getSolvedPath() {
-        return this.path.isSolved() ? this.path : null;
+        return this.path.getPath();
     }
 
     public List<City> getCities() {
