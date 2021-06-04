@@ -21,6 +21,14 @@ public class Controller {
         }
     }
 
+    public void setMinimumCityDistance(int x, int y) {
+        try {
+            this.model.setMinimumCityDistance(x, y);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public List<City> getCities() {
         return this.model.getCities();
     }
