@@ -3,43 +3,56 @@ package view;
 import algoname.AlgorithmName;
 import canvasWrapper.CanvasWrapper;
 import city.City;
-import javafx.scene.layout.HBox;
+
 import model.Model;
 import controller.Controller;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.layout.*;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import path.Path;
 
 import java.util.List;
 
-
 public class View extends Application {
-    private final Controller control = new Controller(new Model(10));
-    private final CanvasWrapper canvas = new CanvasWrapper(new Canvas(500, 500));
-    private final int rectWidth = 10;
     private final int rectHeight = 10;
+    private final int rectWidth = 10;
+    private final int canvasHeight = 500;
+    private final int canvasWidth = 500;
+    private final Controller control = new Controller(new Model(15));
+    private final CanvasWrapper canvas = new CanvasWrapper(new Canvas(canvasWidth, canvasHeight));
 
     @Override
     public void start(Stage stage) throws Exception {
         BorderPane main = new BorderPane();
-        control.setUpperBounds(500, 500);
+        HBox canvasHolder = new HBox(canvas.getCanvas());
+        canvasHolder.setMaxWidth(canvasWidth);
+        canvasHolder.setMaxHeight(canvasHeight);
+        canvasHolder.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        canvasHolder.setAlignment(Pos.BASELINE_LEFT);
+
+        main.setPadding(new Insets(20, 0, 0, 20));
+        main.setTop(canvasHolder);
+
+        control.setUpperBounds(canvasWidth, canvasHeight);
+        control.setMinimumCityDistance(rectWidth, rectHeight);
         drawPath();
         drawCities();
 
 
-        main.setCenter(canvas.getCanvas());
+
         Scene scene = new Scene(main, 700, 700);
         stage.setScene(scene);
         stage.show();
 
     }
 
-    public void drawPath() {
+    private void drawPath() {
         control.solve(AlgorithmName.NEAREST_NEIGHBOR);
 
         List<City> cityPath = control.getCompletedPath();
@@ -53,11 +66,11 @@ public class View extends Application {
         }
     }
 
-    public void drawLineBetweenCities(City from, City to) {
+    private void drawLineBetweenCities(City from, City to) {
         canvas.drawLine(from.getX() + (rectWidth/2), from.getY() + (rectWidth/2), to.getX() + (rectWidth/2), to.getY() + (rectHeight/2));
     }
 
-    public void drawCities() {
+    private void drawCities() {
         List<City> cities = control.getCities();
 
         canvas.setFillColor(Color.RED);
