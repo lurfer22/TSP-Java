@@ -4,6 +4,12 @@ import algoname.AlgorithmName;
 import canvasWrapper.CanvasWrapper;
 import city.City;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import model.Model;
 import controller.Controller;
 
@@ -16,6 +22,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.util.List;
 
 public class View extends Application {
@@ -23,53 +30,61 @@ public class View extends Application {
     private final int rectWidth = 10;
     private final int canvasHeight = 500;
     private final int canvasWidth = 500;
-    private final Controller control = new Controller(new Model(15));
     private final CanvasWrapper canvas = new CanvasWrapper(new Canvas(canvasWidth, canvasHeight));
+
+    private Controller control;
+    private int numberOfCities = 15;
+
 
     @Override
     public void start(Stage stage) throws Exception {
+        initializeController();
         BorderPane main = new BorderPane();
-        HBox canvasHolder = new HBox(canvas.getCanvas());
+
+        Label title = new Label("Travelling Salesperson");
+        title.setStyle("-fx-font-size: 30px; -fx-font-weight: bold");
+
+        VBox canvasHolder = new VBox(canvas.getCanvas());
         canvasHolder.setMaxWidth(canvasWidth);
         canvasHolder.setMaxHeight(canvasHeight);
         canvasHolder.setBorder(new Border(new BorderStroke(Color.BLACK,
                 BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
         canvasHolder.setAlignment(Pos.BASELINE_LEFT);
+        canvasHolder.setStyle("-fx-background-color: white;");
 
+        HBox canvasAndComboBox = new HBox(canvasHolder, createAlgoOptionsAndSolveButton());
+        canvasAndComboBox.setSpacing(10);
+
+        HBox drawAndClearCities = new HBox(createClearButton(), createNumberOfCitiesSlider(), createDrawCitiesButton());
+
+        VBox topBox = new VBox(title, canvasAndComboBox, drawAndClearCities);
+        main.setTop(topBox);
+
+
+
+
+
+        main.setStyle("-fx-background-color: gray");
         main.setPadding(new Insets(20, 0, 0, 20));
-        main.setTop(canvasHolder);
 
-        control.setUpperBounds(canvasWidth, canvasHeight);
-        control.setMinimumCityDistance(rectWidth, rectHeight);
-        drawPath();
-        drawCities();
-
-
-
-        Scene scene = new Scene(main, 700, 700);
+        Scene scene = new Scene(main, 750, 650);
         stage.setScene(scene);
         stage.show();
-
     }
 
-    private void drawPath() {
-        control.solve(AlgorithmName.NEAREST_NEIGHBOR);
-
-        List<City> cityPath = control.getCompletedPath();
-        canvas.setLineColor(Color.RED);
-        drawLineBetweenCities(cityPath.get(0), cityPath.get(1));
-        canvas.setLineColor(Color.BLACK);
-
-        for (int i = 1; i < cityPath.size() - 1; i++) {
-            drawLineBetweenCities(cityPath.get(i), cityPath.get(i + 1));
-
-        }
+    private void initializeController() {
+        control = new Controller(new Model(numberOfCities));
+        // change the bounds for city x and y coords
+        control.setUpperBounds(canvasWidth, canvasHeight);
+        // set the minimum distance between cities being generated
+        control.setMinimumCityDistance(rectWidth, rectHeight);
     }
 
-    private void drawLineBetweenCities(City from, City to) {
-        canvas.drawLine(from.getX() + (rectWidth/2), from.getY() + (rectWidth/2), to.getX() + (rectWidth/2), to.getY() + (rectHeight/2));
+    private void drawCitiesAndPath() {
+        this.canvas.clear();
+        drawCities();
+        drawPath();
     }
-
     private void drawCities() {
         List<City> cities = control.getCities();
 
@@ -80,6 +95,89 @@ public class View extends Application {
             City city = cities.get(i);
             canvas.drawRect(city.getX(), city.getY(), rectWidth, rectHeight);
         }
+    }
+
+    private void drawPath() {
+        List<City> cityPath = control.getCompletedPath();
+
+        canvas.setLineColor(Color.RED);
+        drawLineBetweenCities(cityPath.get(0), cityPath.get(1));
+        canvas.setLineColor(Color.BLACK);
+
+        for (int i = 1; i < cityPath.size() - 1; i++) {
+            drawLineBetweenCities(cityPath.get(i), cityPath.get(i + 1));
+        }
+    }
+
+    private void drawLineBetweenCities(City from, City to) {
+        canvas.drawLine(from.getX() + (rectWidth/2), from.getY() + (rectWidth/2), to.getX() + (rectWidth/2), to.getY() + (rectHeight/2));
+    }
+
+    private Button createClearButton() {
+        Button clear = new Button("Clear Screen");
+        clear.setOnMouseClicked(e -> {
+            this.canvas.clear();
+        });
+        return clear;
+    }
+
+    private Button createDrawCitiesButton() {
+        Button draw = new Button("Update City Count");
+        draw.setOnMouseClicked(e -> {
+            initializeController();
+            this.canvas.clear();
+            drawCities();
+        });
+        return draw;
+    }
+
+    private VBox createNumberOfCitiesSlider() {
+        Label numCities = new Label("Number of Cities: 5");
+        numCities.setAlignment(Pos.CENTER);
+        numCities.setStyle("-fx-font-size: 12");
+
+        Slider val = new Slider(5, 50, 5);
+        val.setShowTickMarks(true);
+        val.setShowTickLabels(true);
+        val.setMinWidth(306);
+
+        val.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
+                numCities.setText("Number of Cities: " + t1.intValue());
+                numberOfCities = t1.intValue();
+            }
+        });
+
+        VBox labelSlider = new VBox(numCities, val);
+        labelSlider.setAlignment(Pos.CENTER);
+        return labelSlider;
+    }
+
+    private HBox createAlgoOptionsAndSolveButton() {
+        ChoiceBox<String> algorithmOptions = new ChoiceBox<String>();
+        algorithmOptions.getItems().addAll("Nearest Neighbor", "Greedy");
+
+        Button solve = new Button("Draw Path");
+        solve.setOnMouseClicked(e -> {
+            String selection = algorithmOptions.getValue();
+            if (selection == null) {
+                algorithmOptions.setValue("Nearest Neighbor");
+                control.solve(AlgorithmName.NEAREST_NEIGHBOR);
+            } else {
+                switch (selection) {
+                    case "Nearest Neighbor" -> control.solve(AlgorithmName.NEAREST_NEIGHBOR);
+                    case "Greedy" -> control.solve(AlgorithmName.GREEDY);
+                }
+            }
+            drawCitiesAndPath();
+        });
+
+
+        HBox ret = new HBox(algorithmOptions, solve);
+        ret.setSpacing(5);
+
+        return ret;
     }
 
     public static void main(String [] args) {
