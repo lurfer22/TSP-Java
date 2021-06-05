@@ -20,6 +20,10 @@ public class Path {
 
     }
 
+    public void endPath() {
+        this.path.add(this.path.get(0));
+    }
+
     // return true if city was able to be added, false if otherwise
     public boolean addCityToEndOfPath(City city) {
         if (!this.availableCities.contains(city)) return false;
