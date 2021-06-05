@@ -30,7 +30,7 @@ public class NearestNeighbor extends Algorithm {
             currCity = closestCity;
             temp.addCityToEndOfPath(currCity);
         }
-
+        this.getPath().endPath();
         // set current city to starting city
         // loop through available cities, find city closest to current city
         // add closest city to path
