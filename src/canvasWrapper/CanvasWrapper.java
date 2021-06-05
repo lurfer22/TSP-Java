@@ -58,6 +58,10 @@ public class CanvasWrapper {
         return this.canvas;
     }
 
+    public void clear() {
+        this.getContext2D().clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+
     private boolean outOfBounds(int fromX, int fromY, int toX, int toY) {
         boolean ret = false;
         if (fromX < 0 || fromY < 0 || fromX > this.canvas.getWidth()
