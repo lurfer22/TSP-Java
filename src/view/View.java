@@ -4,12 +4,14 @@ import algoname.AlgorithmName;
 import canvasWrapper.CanvasWrapper;
 import city.City;
 
+import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 import model.Model;
 import controller.Controller;
 
@@ -33,7 +35,7 @@ public class View extends Application {
     private final CanvasWrapper canvas = new CanvasWrapper(new Canvas(canvasWidth, canvasHeight));
 
     private Controller control;
-    private int numberOfCities = 15;
+    private int numberOfCities = 5;
 
 
     @Override
@@ -59,10 +61,6 @@ public class View extends Application {
 
         VBox topBox = new VBox(title, canvasAndComboBox, drawAndClearCities);
         main.setTop(topBox);
-
-
-
-
 
         main.setStyle("-fx-background-color: gray");
         main.setPadding(new Insets(20, 0, 0, 20));
@@ -98,15 +96,32 @@ public class View extends Application {
     }
 
     private void drawPath() {
+        int animationTimeMillis = 250;
         List<City> cityPath = control.getCompletedPath();
 
-        canvas.setLineColor(Color.RED);
-        drawLineBetweenCities(cityPath.get(0), cityPath.get(1));
-        canvas.setLineColor(Color.BLACK);
+        final int[] count = new int[]{1};
+        PauseTransition newPause = new PauseTransition(Duration.millis(animationTimeMillis));
+        newPause.setOnFinished(e -> {
+            if (count[0] != cityPath.size() - 1) {
+                drawLineBetweenCities(cityPath.get(count[0]), cityPath.get(count[0] + 1));
+                count[0]++;
+                newPause.play();
+            }
+        });
 
-        for (int i = 1; i < cityPath.size() - 1; i++) {
-            drawLineBetweenCities(cityPath.get(i), cityPath.get(i + 1));
-        }
+        PauseTransition pause = new PauseTransition(Duration.millis(animationTimeMillis));
+        pause.setOnFinished(e -> {
+            canvas.setLineColor(Color.RED);
+            drawLineBetweenCities(cityPath.get(0), cityPath.get(1));
+            canvas.setLineColor(Color.BLACK);
+            newPause.play();
+        });
+        pause.play();
+
+        // since we can only use final variables inside a lambda function,
+        // we can pass in a final array and only change the indices of the arr
+
+
     }
 
     private void drawLineBetweenCities(City from, City to) {
